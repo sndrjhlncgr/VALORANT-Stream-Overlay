@@ -1,3 +1,5 @@
+import urllib
+
 from flask import Flask, Response, render_template, make_response, request
 from dotenv import load_dotenv, find_dotenv
 import os, socket
@@ -32,6 +34,26 @@ def getCookies():
     response = requests.post(AUTHORIZATION, headers=headers, json=credentials)
     cookies = response.cookies
     return cookies
+
+
+def getAccessToken():
+    cookies = getCookies()
+    credentials = {
+        'type': 'auth',
+        'username': RIOT_USERNAME,
+        'password': RIOT_PASSWORD
+    }
+    headers = {
+        'X-Forwarded-For': f'{CLIENT_IP}'
+    }
+    response = requests.put(AUTHORIZATION, headers=headers, json=credentials, cookies=cookies)
+
+    # WHAT IF WRONG USERNAME AND PASSWORD -> FIXING....
+
+    uri = response.json()['response']['parameters']['uri']
+    access_token = urllib.parse.parse_qs(uri)
+    access_token = access_token['https://playvalorant.com/#access_token'][0]
+    return access_token
 
 
 @app.route('/')
