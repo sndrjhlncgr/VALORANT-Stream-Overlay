@@ -7,7 +7,7 @@ import requests
 from dotenv import load_dotenv, find_dotenv
 from flask import Flask, Response, render_template, make_response, session
 
-import helpers
+from helpers.mapNames import mapNames
 
 hostname = socket.gethostname()
 load_dotenv(find_dotenv())
@@ -24,7 +24,7 @@ USER_REGION = os.getenv("USER_REGION")
 CLIENT_IP = socket.gethostbyname(hostname)
 
 app = Flask(__name__, template_folder="components")
-app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=1)
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=1)
 
 
 def getCookies():
@@ -157,33 +157,33 @@ def getMatchHistory():
         'X-Riot-ClientPlatform': CLIENT_PLATFORM,
     }
 
-    MATCH_LINK = f'https://pd.{USER_REGION}.a.pvp.net/mmr/v1/players/{PLAYER_ID}/competitiveupdates?startIndex=0&endIndex=20'
+    MATCH_LINK = f'https://pd.{USER_REGION}.a.pvp.net/mmr/v1/players/{PLAYER_ID}/competitiveupdates?startIndex=7&endIndex=20'
 
     response = requests.get(MATCH_LINK, headers=headers, cookies=COOKIES)
+
     data = response.json()['Matches'][0]
 
     tier_after_update = data['TierAfterUpdate']
     tier_before_update = data['TierBeforeUpdate']
     ranked_rating_earned = data['RankedRatingEarned']
     ranked_ratingAfter_update = data['RankedRatingAfterUpdate']
-    competitive_map = data['MapID']
+    competitive_link = data['MapID']
 
-    calculateResponse(tier_after_update, tier_before_update, ranked_rating_earned, ranked_ratingAfter_update, competitive_map, IGN)
+    competitive_map = mapNames(competitive_link)
 
-    return tier_after_update, tier_before_update, ranked_rating_earned, ranked_ratingAfter_update, competitive_map, IGN
+    return tier_after_update, tier_before_update, ranked_ratingAfter_update, ranked_rating_earned, competitive_map, IGN
 
-
-def calculateResponse(tier_after_update, tier_before_update, ranked_rating_earned, ranked_ratingAfter_update, competitive_map, IGN):
-    pass
-
-
-# rankNames
 
 @app.route('/')
 def start():
-    print(getMatchHistory())
+    tier_after_update, tier_before_update, ranked_ratingAfter_update, ranked_rating_earned, competitive_map, IGN = getMatchHistory()
     data = {
-
+        "currentRank": tier_after_update,
+        "pastRank": tier_before_update,
+        "rankProgression": ranked_ratingAfter_update,
+        "rankPoints": ranked_rating_earned,
+        "map": competitive_map,
+        "name": IGN
     }
     return render_template("valorantRank.html.j2", **data)
 
