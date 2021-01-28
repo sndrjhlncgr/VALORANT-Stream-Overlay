@@ -1,10 +1,13 @@
+import datetime
 import os
 import socket
 import urllib
 
 import requests
 from dotenv import load_dotenv, find_dotenv
-from flask import Flask, Response, render_template, make_response
+from flask import Flask, Response, render_template, make_response, session
+
+import helpers
 
 hostname = socket.gethostname()
 load_dotenv(find_dotenv())
@@ -21,9 +24,12 @@ USER_REGION = os.getenv("USER_REGION")
 CLIENT_IP = socket.gethostbyname(hostname)
 
 app = Flask(__name__, template_folder="components")
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=1)
 
 
 def getCookies():
+    if session.get('riot_cookies'):
+        return session.get('riot_cookies')
     credentials = {
         'client_id': 'play-valorant-web-prod',
         'nonce': '1',
@@ -36,14 +42,19 @@ def getCookies():
         'X-Forwarded-For': f'{CLIENT_IP}'
     }
     response = requests.post(AUTHORIZATION, headers=headers, json=credentials)
+    print("cookies", response)
     cookies = response.cookies
-
+    session['riot_cookies'] = cookies.get_dict()
     return cookies
 
 
 def getAccessToken():
-    COOKIES = getCookies()
+    if session.get('riot_access_token'):
+        return session.get('riot_access_token')
 
+    COOKIES = session.get('riot_cookies')
+    if not COOKIES:
+        COOKIES = getCookies()
     credentials = {
         'type': 'auth',
         'username': RIOT_USERNAME,
@@ -53,35 +64,50 @@ def getAccessToken():
         'X-Forwarded-For': f'{CLIENT_IP}'
     }
     response = requests.put(AUTHORIZATION, headers=headers, json=credentials, cookies=COOKIES)
-
+    print("access_token", response)
     # WHAT IF WRONG USERNAME AND PASSWORD -> FIXING....
 
     uri = response.json()['response']['parameters']['uri']
     access_token = urllib.parse.parse_qs(uri)
     access_token = access_token['https://playvalorant.com/#access_token'][0]
 
+    session['riot_access_token'] = access_token
     return access_token
 
 
 def getEntitlementToken():
-    ACCESS_TOKEN = getAccessToken()
-    COOKIES = getCookies()
+    if session.get('riot_entitlement_token'):
+        return session.get('riot_entitlement_token')
+
+    ACCESS_TOKEN = session.get('riot_access_token')
+    COOKIES = session.get('riot_cookies')
+
+    if not ACCESS_TOKEN or COOKIES:
+        ACCESS_TOKEN = getAccessToken()
+        COOKIES = getCookies()
 
     headers = {
         'Authorization': f'Bearer {ACCESS_TOKEN}',
     }
     response = requests.post(ENTITLEMENT_TOKEN_LINK, headers=headers, json={}, cookies=COOKIES)
+    print("entitlement_token", response)
     entitlement_token = response.json()['entitlements_token']
 
-    res = make_response('adding entitlement_token cookie')
-    res.set_cookie('entitlement_token', entitlement_token)
+    session['riot_entitlement_token'] = entitlement_token
 
     return entitlement_token
 
 
 def user():
-    ACCESS_TOKEN = getAccessToken()
-    COOKIES = getCookies()
+    player_id, game_name = session.get('riot_player_id'), session.get('riot_game_name')
+    if player_id and game_name:
+        return player_id, game_name
+    ACCESS_TOKEN = session.get('riot_access_token')
+    COOKIES = session.get('riot_cookies')
+
+    if not ACCESS_TOKEN or COOKIES:
+        ACCESS_TOKEN = getAccessToken()
+        COOKIES = getCookies()
 
     headers = {
         'Authorization': f'Bearer {ACCESS_TOKEN}',
@@ -90,37 +116,68 @@ def user():
 
     response = requests.post(AUTHORIZATION_INFORMATION, headers=headers, json={}, cookies=COOKIES)
     data = response.json()
-    user_id = data['sub']
+    player_id = data['sub']
     riot = data['acct']['game_name']
     tagline = data['acct']['tag_line']
     game_name = "{0} #{1}".format(riot, tagline)
 
-    return user_id, game_name
+    session['riot_player_id'] = player_id
+    session['riot_game_name'] = game_name
+
+    return player_id, game_name
+
+
+def sessionCheck():
+    PLAYER_ID, IGN = user()
+    ACCESS_TOKEN = session.get('riot_access_token')
+    ENTITLEMENT_TOKEN = session.get('riot_entitlement_token')
+    COOKIES = session.get('riot_cookies')
+
+    if not ACCESS_TOKEN:
+        ACCESS_TOKEN = getAccessToken()
+
+    if not ENTITLEMENT_TOKEN:
+        ENTITLEMENT_TOKEN = getEntitlementToken()
+
+    if not COOKIES:
+        COOKIES = getCookies()
+
+    if not PLAYER_ID and not IGN:
+        PLAYER_ID, IGN = user()
+
+    return ACCESS_TOKEN, ENTITLEMENT_TOKEN, COOKIES, PLAYER_ID, IGN
 
 
 def getMatchHistory():
-    PLAYER_ID, IGN = user()
-    ACCESS_TOKEN = getAccessToken()
-    ENTITLEMENT_TOKEN = getEntitlementToken()
-    COOKIES = getCookies()
+    ACCESS_TOKEN, ENTITLEMENT_TOKEN, COOKIES, PLAYER_ID, IGN = sessionCheck()
+
     headers = {
         'Authorization': f'Bearer {ACCESS_TOKEN}',
         'X-Riot-Entitlements-JWT': f'{ENTITLEMENT_TOKEN}',
         'X-Riot-ClientPlatform': CLIENT_PLATFORM,
     }
 
-    MATCH_LINK = f'https://pd.{USER_REGION}.a.pvp.net/mmr/v1/players/{PLAYER_ID}/competitiveupdates?startIndex=0&endIndex=1'
+    MATCH_LINK = f'https://pd.{USER_REGION}.a.pvp.net/mmr/v1/players/{PLAYER_ID}/competitiveupdates?startIndex=0&endIndex=20'
 
     response = requests.get(MATCH_LINK, headers=headers, cookies=COOKIES)
-
     data = response.json()['Matches'][0]
 
     tier_after_update = data['TierAfterUpdate']
     tier_before_update = data['TierBeforeUpdate']
     ranked_rating_earned = data['RankedRatingEarned']
+    ranked_ratingAfter_update = data['RankedRatingAfterUpdate']
+    competitive_map = data['MapID']
 
-    return tier_after_update, tier_before_update, ranked_rating_earned, IGN
+    calculateResponse(tier_after_update, tier_before_update, ranked_rating_earned, ranked_ratingAfter_update, competitive_map, IGN)
 
+    return tier_after_update, tier_before_update, ranked_rating_earned, ranked_ratingAfter_update, competitive_map, IGN
+
+
+def calculateResponse(tier_after_update, tier_before_update, ranked_rating_earned, ranked_ratingAfter_update, competitive_map, IGN):
+    pass
+
+
+# rankNames
 
 @app.route('/')
 def start():
@@ -143,4 +200,5 @@ def catch_all(path):
 
 
 if __name__ == '__main__':
+    app.secret_key = 'VALORANT_RIOT_GAMES'
     app.run(debug=True)
