@@ -8,9 +8,10 @@ import urllib
 
 import requests
 from dotenv import load_dotenv, find_dotenv
-from flask import Flask, Response, render_template, make_response, session, request
+from flask import Flask, Response, render_template, make_response, session, request, url_for
 
 from helpers.mapNames import mapNames
+from helpers.rankNames import rankNames
 
 hostname = socket.gethostname()
 load_dotenv(find_dotenv())
@@ -237,10 +238,10 @@ def getMatchHistory():
 @app.route('/')
 def start():
     stats = getMatchHistory()
-    print(stats)
     data = {
-        "currentRank": stats['tier_after_update'],
-        "pastRank": stats['tier_before_update'],
+        "currentRankName": rankNames(stats['tier_after_update']),
+        "currentRankCode": str(stats['tier_after_update']),
+        "pastRank": rankNames(stats['tier_before_update']),
         "rankProgression": stats['ranked_ratingAfter_update'],
         "rankPoints": stats['ranked_rating_earned'],
         "map": stats['competitive_map'],
