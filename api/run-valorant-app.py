@@ -32,6 +32,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(seconds=3600)
 def getCookies():
     if session.get('riot_cookies'):
         return session.get('riot_cookies')
+
     credentials = {
         'client_id': 'play-valorant-web-prod',
         'nonce': '1',
@@ -44,9 +45,9 @@ def getCookies():
         'X-Forwarded-For': f'{CLIENT_IP}'
     }
     response = requests.post(AUTHORIZATION, headers=headers, json=credentials)
-    print("cookies", response)
     cookies = response.cookies
     session['riot_cookies'] = cookies.get_dict()
+
     return cookies
 
 
@@ -57,14 +58,17 @@ def getAccessToken():
     COOKIES = session.get('riot_cookies')
     if not COOKIES:
         COOKIES = getCookies()
+
     credentials = {
         'type': 'auth',
         'username': RIOT_USERNAME,
         'password': RIOT_PASSWORD
     }
+
     headers = {
         'X-Forwarded-For': f'{CLIENT_IP}'
     }
+
     response = requests.put(AUTHORIZATION, headers=headers, json=credentials, cookies=COOKIES)
     # WHAT IF WRONG USERNAME AND PASSWORD -> FIXING....
 
@@ -75,6 +79,8 @@ def getAccessToken():
     expires_in = data['expires_in'][0]
 
     session['riot_access_token'] = access_token
+    session['riot_access_token_expires_in'] = expires_in
+
     return access_token
 
 
@@ -82,18 +88,14 @@ def getEntitlementToken():
     if session.get('riot_entitlement_token'):
         return session.get('riot_entitlement_token')
 
-    ACCESS_TOKEN = session.get('riot_access_token')
-    COOKIES = session.get('riot_cookies')
-
-    if not ACCESS_TOKEN or COOKIES:
-        ACCESS_TOKEN = getAccessToken()
-        COOKIES = getCookies()
+    ACCESS_TOKEN = session.get('riot_access_token') if session.get('riot_access_token') else getAccessToken()
+    COOKIES = session.get('riot_cookies') if session.get('riot_cookies') else getCookies()
 
     headers = {
         'Authorization': f'Bearer {ACCESS_TOKEN}',
     }
+
     response = requests.post(ENTITLEMENT_TOKEN_LINK, headers=headers, json={}, cookies=COOKIES)
-    print("entitlement_token", response)
     entitlement_token = response.json()['entitlements_token']
 
     session['riot_entitlement_token'] = entitlement_token
@@ -103,14 +105,12 @@ def getEntitlementToken():
 
 def user():
     player_id, game_name = session.get('riot_player_id'), session.get('riot_game_name')
+
     if player_id and game_name:
         return player_id, game_name
-    ACCESS_TOKEN = session.get('riot_access_token')
-    COOKIES = session.get('riot_cookies')
 
-    if not ACCESS_TOKEN or COOKIES:
-        ACCESS_TOKEN = getAccessToken()
-        COOKIES = getCookies()
+    ACCESS_TOKEN = session.get('riot_access_token') if session.get('riot_access_token') else getAccessToken()
+    COOKIES = session.get('riot_cookies') if session.get('riot_cookies') else getCookies()
 
     headers = {
         'Authorization': f'Bearer {ACCESS_TOKEN}',
@@ -119,6 +119,7 @@ def user():
 
     response = requests.post(AUTHORIZATION_INFORMATION, headers=headers, json={}, cookies=COOKIES)
     data = response.json()
+
     player_id = data['sub']
     riot = data['acct']['game_name']
     tagline = data['acct']['tag_line']
@@ -132,26 +133,19 @@ def user():
 
 def sessionCheck():
     PLAYER_ID, IGN = user()
-    ACCESS_TOKEN = session.get('riot_access_token')
-    ENTITLEMENT_TOKEN = session.get('riot_entitlement_token')
-    COOKIES = session.get('riot_cookies')
-
-    if not ACCESS_TOKEN:
-        ACCESS_TOKEN = getAccessToken()
-
-    if not ENTITLEMENT_TOKEN:
-        ENTITLEMENT_TOKEN = getEntitlementToken()
-
-    if not COOKIES:
-        COOKIES = getCookies()
 
     if not PLAYER_ID and not IGN:
         PLAYER_ID, IGN = user()
 
+    ACCESS_TOKEN = session.get('riot_access_token') if session.get('riot_access_token') else getAccessToken()
+    ENTITLEMENT_TOKEN = session.get('riot_entitlement_token') if session.get(
+        'riot_entitlement_token') else getEntitlementToken()
+    COOKIES = session.get('riot_cookies') if session.get('riot_cookies') else getCookies()
+
     return ACCESS_TOKEN, ENTITLEMENT_TOKEN, COOKIES, PLAYER_ID, IGN
 
 
-def getPath():
+def getFileLocation():
     try:
         file = open('api/status/rank.json', 'r+')
         path = os.path.normpath(file.name)
@@ -164,7 +158,7 @@ def getPath():
 
 def getMatchHistory():
     ACCESS_TOKEN, ENTITLEMENT_TOKEN, COOKIES, PLAYER_ID, IGN = sessionCheck()
-    rankPath = getPath()
+    PATH = getFileLocation()
 
     headers = {
         'Authorization': f'Bearer {ACCESS_TOKEN}',
@@ -185,7 +179,7 @@ def getMatchHistory():
     competitive_map = mapNames(competitive_link)
 
     if not tier_after_update == 0:
-        with open(rankPath, 'r') as ranks:
+        with open(PATH, 'r') as ranks:
             rank = json.load(ranks)
         rank["statistics"] = {
             "tier_after_update": tier_after_update,
@@ -195,11 +189,11 @@ def getMatchHistory():
             "competitive_map": competitive_map,
             "ign": IGN
         }
-        with open(rankPath, 'w') as fp:
+        with open(PATH, 'w') as fp:
             json.dump(rank, fp, indent=2)
         return tier_after_update, tier_before_update, ranked_ratingAfter_update, ranked_rating_earned, competitive_map, IGN
 
-    with open(rankPath, 'r') as ranks:
+    with open(PATH, 'r') as ranks:
         rank = json.load(ranks)
 
     tier_after_update = rank['statistics']['tier_after_update']
