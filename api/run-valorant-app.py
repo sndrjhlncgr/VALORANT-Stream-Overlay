@@ -1,11 +1,13 @@
 import datetime
+import json
 import os
 import socket
+import sys
 import urllib
 
 import requests
 from dotenv import load_dotenv, find_dotenv
-from flask import Flask, Response, render_template, make_response, session
+from flask import Flask, Response, render_template, make_response, session, request
 
 from helpers.mapNames import mapNames
 
@@ -24,7 +26,7 @@ USER_REGION = os.getenv("USER_REGION")
 CLIENT_IP = socket.gethostbyname(hostname)
 
 app = Flask(__name__, template_folder="components")
-app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=1)
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(seconds=3600)
 
 
 def getCookies():
@@ -64,12 +66,13 @@ def getAccessToken():
         'X-Forwarded-For': f'{CLIENT_IP}'
     }
     response = requests.put(AUTHORIZATION, headers=headers, json=credentials, cookies=COOKIES)
-    print("access_token", response)
     # WHAT IF WRONG USERNAME AND PASSWORD -> FIXING....
 
     uri = response.json()['response']['parameters']['uri']
-    access_token = urllib.parse.parse_qs(uri)
-    access_token = access_token['https://playvalorant.com/#access_token'][0]
+    data = urllib.parse.parse_qs(uri)
+
+    access_token = data['https://playvalorant.com/#access_token'][0]
+    expires_in = data['expires_in'][0]
 
     session['riot_access_token'] = access_token
     return access_token
@@ -148,8 +151,20 @@ def sessionCheck():
     return ACCESS_TOKEN, ENTITLEMENT_TOKEN, COOKIES, PLAYER_ID, IGN
 
 
+def getPath():
+    try:
+        file = open('api/status/rank.json', 'r+')
+        path = os.path.normpath(file.name)
+        file.close()
+    except sys.exc_info()[0] as e:
+        print('Error Message: ', e)
+        return None
+    return path
+
+
 def getMatchHistory():
     ACCESS_TOKEN, ENTITLEMENT_TOKEN, COOKIES, PLAYER_ID, IGN = sessionCheck()
+    rankPath = getPath()
 
     headers = {
         'Authorization': f'Bearer {ACCESS_TOKEN}',
@@ -157,10 +172,9 @@ def getMatchHistory():
         'X-Riot-ClientPlatform': CLIENT_PLATFORM,
     }
 
-    MATCH_LINK = f'https://pd.{USER_REGION}.a.pvp.net/mmr/v1/players/{PLAYER_ID}/competitiveupdates?startIndex=7&endIndex=20'
+    MATCH_LINK = f'https://pd.{USER_REGION}.a.pvp.net/mmr/v1/players/{PLAYER_ID}/competitiveupdates?startIndex=0&endIndex=1'
 
     response = requests.get(MATCH_LINK, headers=headers, cookies=COOKIES)
-
     data = response.json()['Matches'][0]
 
     tier_after_update = data['TierAfterUpdate']
@@ -168,8 +182,32 @@ def getMatchHistory():
     ranked_rating_earned = data['RankedRatingEarned']
     ranked_ratingAfter_update = data['RankedRatingAfterUpdate']
     competitive_link = data['MapID']
-
     competitive_map = mapNames(competitive_link)
+
+    if not tier_after_update == 0:
+        with open(rankPath, 'r') as ranks:
+            rank = json.load(ranks)
+        rank["statistics"] = {
+            "tier_after_update": tier_after_update,
+            "tier_before_update": tier_before_update,
+            "ranked_rating_earned": ranked_rating_earned,
+            "ranked_ratingAfter_update": ranked_ratingAfter_update,
+            "competitive_map": competitive_map,
+            "ign": IGN
+        }
+        with open(rankPath, 'w') as fp:
+            json.dump(rank, fp, indent=2)
+        return tier_after_update, tier_before_update, ranked_ratingAfter_update, ranked_rating_earned, competitive_map, IGN
+
+    with open(rankPath, 'r') as ranks:
+        rank = json.load(ranks)
+
+    tier_after_update = rank['statistics']['tier_after_update']
+    tier_before_update = rank['statistics']['tier_before_update']
+    ranked_ratingAfter_update = rank['statistics']['ranked_ratingAfter_update']
+    ranked_rating_earned = rank['statistics']['ranked_rating_earned']
+    competitive_map = rank['statistics']['competitive_map']
+    IGN = rank['statistics']['ign']
 
     return tier_after_update, tier_before_update, ranked_ratingAfter_update, ranked_rating_earned, competitive_map, IGN
 
