@@ -3,6 +3,7 @@ import json
 import os
 import socket
 import sys
+import time
 import urllib
 
 import requests
@@ -166,7 +167,7 @@ def getMatchHistory():
         'X-Riot-ClientPlatform': CLIENT_PLATFORM,
     }
 
-    MATCH_LINK = f'https://pd.{USER_REGION}.a.pvp.net/mmr/v1/players/{PLAYER_ID}/competitiveupdates?startIndex=0&endIndex=1'
+    MATCH_LINK = f'https://pd.{USER_REGION}.a.pvp.net/mmr/v1/players/{PLAYER_ID}/competitiveupdates?startIndex=8&endIndex=20'
 
     response = requests.get(MATCH_LINK, headers=headers, cookies=COOKIES)
     data = response.json()['Matches'][0]
@@ -179,6 +180,9 @@ def getMatchHistory():
     competitive_map = mapNames(competitive_link)
 
     if not tier_after_update == 0:
+        game_time = data['MatchStartTime'] // 1000
+        match_date = time.strftime('%m-%d-%Y', time.localtime(game_time))
+
         with open(PATH, 'r') as ranks:
             rank = json.load(ranks)
         rank["statistics"] = {
@@ -187,6 +191,7 @@ def getMatchHistory():
             "ranked_rating_earned": ranked_rating_earned,
             "ranked_ratingAfter_update": ranked_ratingAfter_update,
             "competitive_map": competitive_map,
+            "match_date": match_date,
             "ign": IGN
         }
         with open(PATH, 'w') as fp:
