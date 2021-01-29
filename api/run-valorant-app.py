@@ -157,9 +157,53 @@ def getFileLocation():
     return path
 
 
+def updateJSON(data):
+    PATH = getFileLocation()
+
+    game_time = data['match_date'] // 1000
+    match_date = time.strftime('%m-%d-%Y', time.localtime(game_time))
+
+    with open(PATH, 'r') as ranks:
+        rank = json.load(ranks)
+
+    rank["statistics"] = {
+        "tier_after_update": data['tier_after_update'],
+        "tier_before_update": data['tier_before_update'],
+        "ranked_rating_earned": data['ranked_rating_earned'],
+        "ranked_ratingAfter_update": data['ranked_ratingAfter_update'],
+        "competitive_map": data['competitive_map'],
+        "match_date": match_date,
+        "ign": data['ign']
+    }
+    with open(PATH, 'w') as fp:
+        json.dump(rank, fp, indent=2)
+
+    data['match_date'] = match_date
+
+    return data
+
+
+def getRankJSON():
+    PATH = getFileLocation()
+
+    with open(PATH, 'r') as ranks:
+        rank = json.load(ranks)
+
+    data = {
+        "tier_after_update": rank['statistics']['tier_after_update'],
+        "tier_before_update": rank['statistics']['tier_before_update'],
+        "ranked_ratingAfter_update": rank['statistics']['ranked_ratingAfter_update'],
+        "ranked_rating_earned": rank['statistics']['ranked_rating_earned'],
+        "competitive_map": rank['statistics']['competitive_map'],
+        "match_date": rank['statistics']['match_date'],
+        "ign": rank['statistics']['ign'],
+    }
+
+    return data
+
+
 def getMatchHistory():
     ACCESS_TOKEN, ENTITLEMENT_TOKEN, COOKIES, PLAYER_ID, IGN = sessionCheck()
-    PATH = getFileLocation()
 
     headers = {
         'Authorization': f'Bearer {ACCESS_TOKEN}',
@@ -167,60 +211,41 @@ def getMatchHistory():
         'X-Riot-ClientPlatform': CLIENT_PLATFORM,
     }
 
-    MATCH_LINK = f'https://pd.{USER_REGION}.a.pvp.net/mmr/v1/players/{PLAYER_ID}/competitiveupdates?startIndex=8&endIndex=20'
+    MATCH_LINK = f'https://pd.{USER_REGION}.a.pvp.net/mmr/v1/players/{PLAYER_ID}/competitiveupdates?startIndex=0&endIndex=1'
 
     response = requests.get(MATCH_LINK, headers=headers, cookies=COOKIES)
     data = response.json()['Matches'][0]
 
-    tier_after_update = data['TierAfterUpdate']
-    tier_before_update = data['TierBeforeUpdate']
-    ranked_rating_earned = data['RankedRatingEarned']
-    ranked_ratingAfter_update = data['RankedRatingAfterUpdate']
-    competitive_link = data['MapID']
-    competitive_map = mapNames(competitive_link)
+    rank_info = {
+        "tier_after_update": data['TierAfterUpdate'],
+        "tier_before_update": data['TierBeforeUpdate'],
+        "ranked_rating_earned": data['RankedRatingEarned'],
+        "ranked_ratingAfter_update": data['RankedRatingAfterUpdate'],
+        "competitive_map": mapNames(data['MapID']),
+        "match_date": data['MatchStartTime'],
+        "ign": IGN
+    }
 
-    if not tier_after_update == 0:
-        game_time = data['MatchStartTime'] // 1000
-        match_date = time.strftime('%m-%d-%Y', time.localtime(game_time))
+    if not rank_info['tier_after_update'] == 0:
+        updatedRank = updateJSON(rank_info)
+        return updatedRank
 
-        with open(PATH, 'r') as ranks:
-            rank = json.load(ranks)
-        rank["statistics"] = {
-            "tier_after_update": tier_after_update,
-            "tier_before_update": tier_before_update,
-            "ranked_rating_earned": ranked_rating_earned,
-            "ranked_ratingAfter_update": ranked_ratingAfter_update,
-            "competitive_map": competitive_map,
-            "match_date": match_date,
-            "ign": IGN
-        }
-        with open(PATH, 'w') as fp:
-            json.dump(rank, fp, indent=2)
-        return tier_after_update, tier_before_update, ranked_ratingAfter_update, ranked_rating_earned, competitive_map, IGN
-
-    with open(PATH, 'r') as ranks:
-        rank = json.load(ranks)
-
-    tier_after_update = rank['statistics']['tier_after_update']
-    tier_before_update = rank['statistics']['tier_before_update']
-    ranked_ratingAfter_update = rank['statistics']['ranked_ratingAfter_update']
-    ranked_rating_earned = rank['statistics']['ranked_rating_earned']
-    competitive_map = rank['statistics']['competitive_map']
-    IGN = rank['statistics']['ign']
-
-    return tier_after_update, tier_before_update, ranked_ratingAfter_update, ranked_rating_earned, competitive_map, IGN
+    defaultRank = getRankJSON()
+    return defaultRank
 
 
 @app.route('/')
 def start():
-    tier_after_update, tier_before_update, ranked_ratingAfter_update, ranked_rating_earned, competitive_map, IGN = getMatchHistory()
+    stats = getMatchHistory()
+    print(stats)
     data = {
-        "currentRank": tier_after_update,
-        "pastRank": tier_before_update,
-        "rankProgression": ranked_ratingAfter_update,
-        "rankPoints": ranked_rating_earned,
-        "map": competitive_map,
-        "name": IGN
+        "currentRank": stats['tier_after_update'],
+        "pastRank": stats['tier_before_update'],
+        "rankProgression": stats['ranked_ratingAfter_update'],
+        "rankPoints": stats['ranked_rating_earned'],
+        "map": stats['competitive_map'],
+        "match_date": stats['match_date'],
+        "name": stats['ign']
     }
     return render_template("valorantRank.html.j2", **data)
 
