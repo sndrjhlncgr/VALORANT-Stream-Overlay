@@ -1,22 +1,9 @@
 <svg width="480" height="133" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <foreignObject width="480" height="133">
         <div xmlns="http://www.w3.org/1999/xhtml" class="container">
-        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
         <style>
-            .rank-name {
-                margin-left:110px;
-                margin-top:-100px;
-                margin-bottom:-3px;
-                font-family: 'Roboto', sans-serif;
-                font-size: 32px;
-            }
-
-            .current-rank{
-                margin-left:111px;
-                font-family: 'Roboto', sans-serif;
-                font-size: 10px;
-            }
-
             .progress-bar {
               background: #e3e3e3;
               border-radius: 8px;
@@ -25,7 +12,7 @@
               margin: 40px auto;
               position: relative;
               width: 260px;
-              margin-top:10px;
+              margin-top:6px;
             }
 
             .progress-bar:before {
@@ -440,6 +427,86 @@
               width: 100%;
               border-radius: 8px;
             }
+
+            .main {
+                height:80%;
+                padding-top:10px;
+                border:2px solid red;
+            }
+
+            .rank-name {
+                margin-left:110px;
+                margin-top:-100px;
+                margin-bottom:-3px;
+                font-family: 'Roboto', sans-serif;
+                font-size: 32px;
+                color:#474747;
+            }
+
+            .current-rank{
+                margin-left:111px;
+                font-family: 'Roboto', sans-serif;
+                font-size: 10px;
+                color:#474747;
+            }
+
+            .rank-points    {
+                margin-left:110px;
+                margin-top:-30px;
+                margin-bottom:-3px;
+                font-family: 'Roboto', sans-serif;
+                font-weight:300;
+                font-size: 20px;
+                color:#474747;
+            }
+
+            .headerDivider {
+                 border-left:1px solid #38546d;
+                 height:21px;
+                 position:absolute;
+                 right:309px;
+                 top:83px;
+            }
+
+
+            .triangle-top{
+              width: 0;
+              height: 0;
+              margin: -16px 0px 0px 142px;
+            }
+            .triangle-top{
+              border-left:
+                6px solid transparent;
+              border-right:
+                6px solid transparent;
+            }
+
+            .triangle-top{
+              border-bottom:
+                  10px solid #49f70a;
+            }
+
+
+
+
+            .triangle-bottom{
+              width: 0px;
+              height: 0;
+              margin: -16px 0px 0px 142px;
+            }
+
+            .triangle-bottom{
+              border-left:
+                6px solid transparent;
+              border-right:
+                6px solid transparent;
+            }
+            .triangle-bottom{
+              border-top:
+                10px solid #ff000d;
+            }
+
+
         </style>
          <div class="main">
              <div class="rank-image">
@@ -449,6 +516,11 @@
                  <h1 class="rank-name">{{currentRankName}}</h1>
                  <small class="current-rank">CURRENT RANK</small>
                  <div class="progress-bar" data-number="{{rankProgression}}"></div>
+             </div>
+             <div>
+                <h6 class="rank-points">{{rankPoints}}</h6>
+                <div class="{{rankPointsStatus}}"></div>
+                <div class="headerDivider"></div>
              </div>
          </div>
         </div>

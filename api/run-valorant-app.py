@@ -73,7 +73,7 @@ def getAccessToken():
 
     response = requests.put(AUTHORIZATION, headers=headers, json=credentials, cookies=COOKIES)
     # WHAT IF WRONG USERNAME AND PASSWORD -> FIXING....
-
+    print(response)
     uri = response.json()['response']['parameters']['uri']
     data = urllib.parse.parse_qs(uri)
 
@@ -203,6 +203,12 @@ def getRankJSON():
     return data
 
 
+def rankStatus(rank):
+    if rank < 0:
+        return "triangle-bottom"
+    return "triangle-top"
+
+
 def getMatchHistory():
     ACCESS_TOKEN, ENTITLEMENT_TOKEN, COOKIES, PLAYER_ID, IGN = sessionCheck()
 
@@ -249,10 +255,12 @@ def start():
         "pastRank": pastRank[0],
         "rankProgression": stats['ranked_ratingAfter_update'],
         "rankPoints": stats['ranked_rating_earned'],
+        "rankPointsStatus": rankStatus(stats['ranked_rating_earned']),
         "map": stats['competitive_map'],
         "match_date": stats['match_date'],
         "name": stats['ign']
     }
+    print(data)
     return render_template("valorantRank.html.j2", **data)
 
 
