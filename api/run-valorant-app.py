@@ -238,10 +238,15 @@ def getMatchHistory():
 @app.route('/')
 def start():
     stats = getMatchHistory()
+
+    currentRankName = rankNames(stats['tier_after_update'])
+    pastRank = rankNames(stats['tier_before_update'])
+
     data = {
-        "currentRankName": rankNames(stats['tier_after_update']),
+        "currentRankName": currentRankName[0],
+        "progressColor": currentRankName[1],
         "currentRankCode": str(stats['tier_after_update']),
-        "pastRank": rankNames(stats['tier_before_update']),
+        "pastRank": pastRank[0],
         "rankProgression": stats['ranked_ratingAfter_update'],
         "rankPoints": stats['ranked_rating_earned'],
         "map": stats['competitive_map'],
