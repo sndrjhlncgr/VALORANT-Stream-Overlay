@@ -250,7 +250,8 @@ def start():
 
     data = {
         "currentRankName": currentRankName[0],
-        "progressColor": currentRankName[1],
+        "progressBarColor": currentRankName[1],
+        "currentColor": currentRankName[2],
         "currentRankCode": str(stats['tier_after_update']),
         "pastRank": pastRank[0],
         "rankProgression": stats['ranked_ratingAfter_update'],

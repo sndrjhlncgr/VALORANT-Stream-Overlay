@@ -1,28 +1,43 @@
-<svg width="480" height="133" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <foreignObject width="480" height="133">
+<svg width="480" height="160" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <foreignObject width="480" height="160">
         <div xmlns="http://www.w3.org/1999/xhtml" class="container">
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
         <style>
             .progress-bar {
-              background: #e3e3e3;
               border-radius: 8px;
               display: block;
               height: 7px;
               margin: 40px auto;
               position: relative;
-              width: 260px;
+              width: 280px;
               margin-top:6px;
+              margin-left: 111px;
+              border: 1px solid #c2c2c2;
+            }
+            @keyframes gradient {
+                0% {
+                    background-position: 0% 50%;
+                }
+                50% {
+                    background-position: 100% 50%;
+                }
+                100% {
+                    background-position: 0% 50%;
+                }
             }
 
             .progress-bar:before {
-              background: {{progressColor}};
+
+              background: {{progressBarColor}};
+              background-size: 400% 400%;
+              animation: gradient 15s ease infinite;
               border-right: 1px solid #d5aa4f;
               border-radius: 8px 1px 1px 8px;
               bottom: 0;
               content: "";
               display: inline-block;
-              left: 0;
+              left: -1;
               position: absolute;
               top: 0;
             }
@@ -428,11 +443,27 @@
               border-radius: 8px;
             }
 
-            .main {
-                height:80%;
-                padding-top:10px;
-                border:2px solid red;
+            .trapezoid {
+
+                border-bottom: 25px solid {{currentColor}};
+                border-right: 20px solid transparent;
+                height: 0;
+                width: 180px;
             }
+            .badge-title {
+              font-family: 'Roboto', sans-serif;
+              font-size: 20px;
+              margin-left:15px;
+              color:white;
+            }
+            .main {
+                height:70%;
+                padding-top:10px;
+                border:2px solid {{currentColor}};
+                border-radius:0px 15px 15px 15px
+            }
+
+
 
             .rank-name {
                 margin-left:110px;
@@ -451,21 +482,33 @@
             }
 
             .rank-points    {
-                margin-left:110px;
+                margin-left:115px;
                 margin-top:-30px;
                 margin-bottom:-3px;
                 font-family: 'Roboto', sans-serif;
-                font-weight:300;
-                font-size: 20px;
+                font-weight:bold;
+                font-size: 18px;
                 color:#474747;
+            }
+
+            .rank-points-box {
+
+                border:none;
+                width: 58px;
+                height: 30px;
+                position:absolute;
+                margin-top:-35px;
+                margin-left: 105px;
+                z-index:-999;
+                border-radius: 10px 10px 10px 10px;
             }
 
             .headerDivider {
                  border-left:1px solid #38546d;
                  height:21px;
                  position:absolute;
-                 right:309px;
-                 top:83px;
+                 right:308px;
+                 top:110px;
             }
 
 
@@ -508,6 +551,9 @@
 
 
         </style>
+         <div class="trapezoid ">
+            <small class="badge-title">Valorant</small>
+         </div>
          <div class="main">
              <div class="rank-image">
                 <img src="{{ url_for('static', filename='ranks/' + currentRankCode +'.png') }}" width="100px" height="100px">
@@ -517,11 +563,12 @@
                  <small class="current-rank">CURRENT RANK</small>
                  <div class="progress-bar" data-number="{{rankProgression}}"></div>
              </div>
-             <div>
+             <div">
+                <div class="rank-points-box"></div>
                 <h6 class="rank-points">{{rankPoints}}</h6>
                 <div class="{{rankPointsStatus}}"></div>
-                <div class="headerDivider"></div>
              </div>
+             <div class="headerDivider"></div>
          </div>
         </div>
     </foreignObject>
