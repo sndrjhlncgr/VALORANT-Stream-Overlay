@@ -1,14 +1,456 @@
 <svg width="480" height="133" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <foreignObject width="480" height="133">
         <div xmlns="http://www.w3.org/1999/xhtml" class="container">
-            {{currentRank}}
-             {{pastRank}}
-              {{rankProgression}}
-               {{rankPoints}}
-                {{map}}
-                    {{name}}
-                    {{match_date}}
-            <img src="{{ url_for('static', filename='ranks/' + currentRankCode +'.png') }}" width="100px" height="100px" >
+        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+        <style>
+            .rank-name {
+                margin-left:110px;
+                margin-top:-100px;
+                margin-bottom:-3px;
+                font-family: 'Roboto', sans-serif;
+                font-size: 32px;
+            }
+
+            .current-rank{
+                margin-left:111px;
+                font-family: 'Roboto', sans-serif;
+                font-size: 10px;
+            }
+
+            .progress-bar {
+              background: #e3e3e3;
+              border-radius: 8px;
+              display: block;
+              height: 7px;
+              margin: 40px auto;
+              position: relative;
+              width: 260px;
+              margin-top:10px;
+            }
+
+            .progress-bar:before {
+              background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
+              border-right: 1px solid #d5aa4f;
+              border-radius: 8px 1px 1px 8px;
+              bottom: 0;
+              content: "";
+              display: inline-block;
+              left: 0;
+              position: absolute;
+              top: 0;
+            }
+
+            [data-number="1"]:before {
+              width: 1%;
+            }
+
+            [data-number="2"]:before {
+              width: 2%;
+            }
+
+            [data-number="3"]:before {
+              width: 3%;
+            }
+
+            [data-number="4"]:before {
+              width: 4%;
+            }
+
+            [data-number="5"]:before {
+              width: 5%;
+            }
+
+            [data-number="6"]:before {
+              width: 6%;
+            }
+
+            [data-number="7"]:before {
+              width: 7%;
+            }
+
+            [data-number="8"]:before {
+              width: 8%;
+            }
+
+            [data-number="9"]:before {
+              width: 9%;
+            }
+
+            [data-number="10"]:before {
+              width: 10%;
+            }
+
+            [data-number="11"]:before {
+              width: 11%;
+            }
+
+            [data-number="12"]:before {
+              width: 12%;
+            }
+
+            [data-number="13"]:before {
+              width: 13%;
+            }
+
+            [data-number="14"]:before {
+              width: 14%;
+            }
+
+            [data-number="15"]:before {
+              width: 15%;
+            }
+
+            [data-number="16"]:before {
+              width: 16%;
+            }
+
+            [data-number="17"]:before {
+              width: 17%;
+            }
+
+            [data-number="18"]:before {
+              width: 18%;
+            }
+
+            [data-number="19"]:before {
+              width: 19%;
+            }
+
+            [data-number="20"]:before {
+              width: 20%;
+            }
+
+            [data-number="21"]:before {
+              width: 21%;
+            }
+
+            [data-number="22"]:before {
+              width: 22%;
+            }
+
+            [data-number="23"]:before {
+              width: 23%;
+            }
+
+            [data-number="24"]:before {
+              width: 24%;
+            }
+
+            [data-number="25"]:before {
+              width: 25%;
+            }
+
+            [data-number="26"]:before {
+              width: 26%;
+            }
+
+            [data-number="27"]:before {
+              width: 27%;
+            }
+
+            [data-number="28"]:before {
+              width: 28%;
+            }
+
+            [data-number="29"]:before {
+              width: 29%;
+            }
+
+            [data-number="30"]:before {
+              width: 30%;
+            }
+
+            [data-number="31"]:before {
+              width: 31%;
+            }
+
+            [data-number="32"]:before {
+              width: 32%;
+            }
+
+            [data-number="33"]:before {
+              width: 33%;
+            }
+
+            [data-number="34"]:before {
+              width: 34%;
+            }
+
+            [data-number="35"]:before {
+              width: 35%;
+            }
+
+            [data-number="36"]:before {
+              width: 36%;
+            }
+
+            [data-number="37"]:before {
+              width: 37%;
+            }
+
+            [data-number="38"]:before {
+              width: 38%;
+            }
+
+            [data-number="39"]:before {
+              width: 39%;
+            }
+
+            [data-number="40"]:before {
+              width: 40%;
+            }
+
+            [data-number="41"]:before {
+              width: 41%;
+            }
+
+            [data-number="42"]:before {
+              width: 42%;
+            }
+
+            [data-number="43"]:before {
+              width: 43%;
+            }
+
+            [data-number="44"]:before {
+              width: 44%;
+            }
+
+            [data-number="45"]:before {
+              width: 45%;
+            }
+
+            [data-number="46"]:before {
+              width: 46%;
+            }
+
+            [data-number="47"]:before {
+              width: 47%;
+            }
+
+            [data-number="48"]:before {
+              width: 48%;
+            }
+
+            [data-number="49"]:before {
+              width: 49%;
+            }
+
+            [data-number="50"]:before {
+              width: 50%;
+            }
+
+            [data-number="51"]:before {
+              width: 51%;
+            }
+
+            [data-number="52"]:before {
+              width: 52%;
+            }
+
+            [data-number="53"]:before {
+              width: 53%;
+            }
+
+            [data-number="54"]:before {
+              width: 54%;
+            }
+
+            [data-number="55"]:before {
+              width: 55%;
+            }
+
+            [data-number="56"]:before {
+              width: 56%;
+            }
+
+            [data-number="57"]:before {
+              width: 57%;
+            }
+
+            [data-number="58"]:before {
+              width: 58%;
+            }
+
+            [data-number="59"]:before {
+              width: 59%;
+            }
+
+            [data-number="60"]:before {
+              width: 60%;
+            }
+
+            [data-number="61"]:before {
+              width: 61%;
+            }
+
+            [data-number="62"]:before {
+              width: 62%;
+            }
+
+            [data-number="63"]:before {
+              width: 63%;
+            }
+
+            [data-number="64"]:before {
+              width: 64%;
+            }
+
+            [data-number="65"]:before {
+              width: 65%;
+            }
+
+            [data-number="66"]:before {
+              width: 66%;
+            }
+
+            [data-number="67"]:before {
+              width: 67%;
+            }
+
+            [data-number="68"]:before {
+              width: 68%;
+            }
+
+            [data-number="69"]:before {
+              width: 69%;
+            }
+
+            [data-number="70"]:before {
+              width: 70%;
+            }
+
+            [data-number="71"]:before {
+              width: 71%;
+            }
+
+            [data-number="72"]:before {
+              width: 72%;
+            }
+
+            [data-number="73"]:before {
+              width: 73%;
+            }
+
+            [data-number="74"]:before {
+              width: 74%;
+            }
+
+            [data-number="75"]:before {
+              width: 75%;
+            }
+
+            [data-number="76"]:before {
+              width: 76%;
+            }
+
+            [data-number="77"]:before {
+              width: 77%;
+            }
+
+            [data-number="78"]:before {
+              width: 78%;
+            }
+
+            [data-number="79"]:before {
+              width: 79%;
+            }
+
+            [data-number="80"]:before {
+              width: 80%;
+            }
+
+            [data-number="81"]:before {
+              width: 81%;
+            }
+
+            [data-number="82"]:before {
+              width: 82%;
+            }
+
+            [data-number="83"]:before {
+              width: 83%;
+            }
+
+            [data-number="84"]:before {
+              width: 84%;
+            }
+
+            [data-number="85"]:before {
+              width: 85%;
+            }
+
+            [data-number="86"]:before {
+              width: 86%;
+            }
+
+            [data-number="87"]:before {
+              width: 87%;
+            }
+
+            [data-number="88"]:before {
+              width: 88%;
+            }
+
+            [data-number="89"]:before {
+              width: 89%;
+            }
+
+            [data-number="90"]:before {
+              width: 90%;
+            }
+
+            [data-number="91"]:before {
+              width: 91%;
+            }
+
+            [data-number="92"]:before {
+              width: 92%;
+            }
+
+            [data-number="93"]:before {
+              width: 93%;
+            }
+
+            [data-number="94"]:before {
+              width: 94%;
+            }
+
+            [data-number="95"]:before {
+              width: 95%;
+            }
+
+            [data-number="96"]:before {
+              width: 96%;
+            }
+
+            [data-number="97"]:before {
+              width: 97%;
+            }
+
+            [data-number="98"]:before {
+              width: 98%;
+            }
+
+            [data-number="99"]:before {
+              width: 99%;
+            }
+
+            [data-number="100"]:before {
+              width: 100%;
+              border-radius: 8px;
+            }
+        </style>
+         <div class="main">
+             <div class="rank-image">
+                <img src="{{ url_for('static', filename='ranks/' + currentRankCode +'.png') }}" width="100px" height="100px">
+             </div>
+             <div>
+                 <h1 class="rank-name">{{currentRankName}}</h1>
+                 <small class="current-rank">CURRENT RANK</small>
+                 <div class="progress-bar" data-number="{{rankProgression}}"></div>
+             </div>
+         </div>
         </div>
     </foreignObject>
 </svg>
