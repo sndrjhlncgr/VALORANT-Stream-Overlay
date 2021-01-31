@@ -9,6 +9,7 @@ import urllib
 import requests
 from dotenv import load_dotenv, find_dotenv
 from flask import Flask, Response, render_template, make_response, session, request, url_for
+from flask_fontawesome import FontAwesome
 
 from helpers.mapNames import mapNames
 from helpers.rankNames import rankNames
@@ -28,6 +29,7 @@ USER_REGION = os.getenv("USER_REGION")
 CLIENT_IP = socket.gethostbyname(hostname)
 
 app = Flask(__name__, template_folder="components")
+fa = FontAwesome(app)
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(seconds=3600)
 
 
@@ -205,8 +207,8 @@ def getRankJSON():
 
 def rankStatus(rank):
     if rank < 0:
-        return "triangle-bottom"
-    return "triangle-top"
+        return "fas fa-chevron-circle-down"
+    return "fas fa-chevron-circle-up"
 
 
 def getMatchHistory():
@@ -221,8 +223,9 @@ def getMatchHistory():
     MATCH_LINK = f'https://pd.{USER_REGION}.a.pvp.net/mmr/v1/players/{PLAYER_ID}/competitiveupdates?startIndex=0&endIndex=1'
 
     response = requests.get(MATCH_LINK, headers=headers, cookies=COOKIES)
+    print(response.json())
     data = response.json()['Matches'][0]
-
+    print(data)
     rank_info = {
         "tier_after_update": data['TierAfterUpdate'],
         "tier_before_update": data['TierBeforeUpdate'],

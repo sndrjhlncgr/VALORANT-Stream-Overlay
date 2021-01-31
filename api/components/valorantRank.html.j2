@@ -2,6 +2,7 @@
     <foreignObject width="480" height="160">
         <div xmlns="http://www.w3.org/1999/xhtml" class="container">
         <link rel="preconnect" href="https://fonts.gstatic.com">
+        {{ fontawesome_html() }}
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
         <style>
             .progress-bar {
@@ -10,7 +11,7 @@
               height: 7px;
               margin: 40px auto;
               position: relative;
-              width: 280px;
+              width: 324px;
               margin-top:6px;
               margin-left: 111px;
               border: 1px solid #d1d1d1;
@@ -475,72 +476,33 @@
             }
 
             .rank-points    {
-                margin-left:115px;
+                margin-left:186px;
+                margin-top:-21px;
+                margin-bottom:-3px;
+                font-family: 'Roboto', sans-serif;
+                font-weight:bold;
+                font-size: 18px;
+                color:#d1d1d1;
+            }
+            .rank-map {
+                margin-left:114px;
                 margin-top:-30px;
                 margin-bottom:-3px;
                 font-family: 'Roboto', sans-serif;
                 font-weight:bold;
                 font-size: 18px;
-                color:#474747;
+                color:#d1d1d1;
             }
 
-            .rank-points-box {
-
-                border:none;
-                width: 58px;
-                height: 30px;
-                position:absolute;
-                margin-top:-35px;
-                margin-left: 105px;
-                z-index:-999;
-                border-radius: 10px 10px 10px 10px;
-            }
 
             .headerDivider {
                  border-left:1px solid #38546d;
                  height:21px;
                  position:absolute;
-                 right:308px;
-                 top:110px;
+                 right:286px;
+                 top:89px;
             }
 
-
-            .triangle-top{
-              width: 0;
-              height: 0;
-              margin: -16px 0px 0px 142px;
-            }
-            .triangle-top{
-              border-left:
-                6px solid transparent;
-              border-right:
-                6px solid transparent;
-            }
-
-            .triangle-top{
-              border-bottom:
-                  10px solid #49f70a;
-            }
-
-
-
-
-            .triangle-bottom{
-              width: 0px;
-              height: 0;
-              margin: -16px 0px 0px 142px;
-            }
-
-            .triangle-bottom{
-              border-left:
-                6px solid transparent;
-              border-right:
-                6px solid transparent;
-            }
-            .triangle-bottom{
-                border-top:
-                10px solid #ff000d;
-            }
 
             body {
                 background-image: url("https://factschronicle.com/wp-content/uploads/2020/04/2020-04-20-image-18.jpg");
@@ -605,7 +567,25 @@
                 right:0;
             }
 
+            .fa-chevron-circle-down {
+                background: #FF2121;
+                background: -webkit-linear-gradient(to top right, #FF2121 0%, #A30000 73%);
+                background: -moz-linear-gradient(to top right, #FF2121 0%, #A30000 73%);
+                background: linear-gradient(to top right, #FF2121 0%, #A30000 73%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-right:5px;
+            }
 
+            .fa-chevron-circle-up {
+                background: #A2CF0E;
+                background: -webkit-linear-gradient(to top right, #A2CF0E 0%, #11CF4A 73%);
+                background: -moz-linear-gradient(to top right, #A2CF0E 0%, #11CF4A 73%);
+                background: linear-gradient(to top right, #A2CF0E 0%, #11CF4A 73%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                   margin-right:5px;
+            }
 
         </style>
          <div class="rectangle"></div>
@@ -622,12 +602,14 @@
                  <small class="current-rank">CURRENT RANK</small>
                  <div class="progress-bar" data-number="{{rankProgression}}"></div>
              </div>
-             <div">
-                <div class="rank-points-box"></div>
-                <h6 class="rank-points">{{rankPoints}}</h6>
-                <div class="{{rankPointsStatus}}"></div>
+             <div>
+                <h6 class="rank-map">{{map}}</h6>
              </div>
-             <div class="headerDivider"></div>
+              <div class="headerDivider"></div>
+             <div>
+                <h6 class="rank-points"><i class="{{rankPointsStatus}}"></i>{{rankPoints}}</h6>
+             </div>
+
          </div>
         </div>
     </foreignObject>
