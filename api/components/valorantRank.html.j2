@@ -13,13 +13,19 @@
               width: 280px;
               margin-top:6px;
               margin-left: 111px;
-              border: 1px solid #c2c2c2;
+              border: 1px solid #d1d1d1;
             }
             @keyframes gradient {
                 0% {
                     background-position: 0% 50%;
                 }
+                25% {
+                    background-position: 50% 25%;
+                }
                 50% {
+                    background-position: 100% 50%;
+                }
+                75% {
                     background-position: 100% 50%;
                 }
                 100% {
@@ -28,7 +34,6 @@
             }
 
             .progress-bar:before {
-
               background: {{progressBarColor}};
               background-size: 400% 400%;
               animation: gradient 15s ease infinite;
@@ -37,7 +42,7 @@
               bottom: 0;
               content: "";
               display: inline-block;
-              left: -1;
+              left: 0;
               position: absolute;
               top: 0;
             }
@@ -443,24 +448,12 @@
               border-radius: 8px;
             }
 
-            .trapezoid {
 
-                border-bottom: 25px solid {{currentColor}};
-                border-right: 20px solid transparent;
-                height: 0;
-                width: 180px;
-            }
-            .badge-title {
-              font-family: 'Roboto', sans-serif;
-              font-size: 20px;
-              margin-left:15px;
-              color:white;
-            }
+
             .main {
                 height:70%;
-                padding-top:10px;
-                border:2px solid {{currentColor}};
-                border-radius:0px 15px 15px 15px
+                padding-top:15px;
+                padding-left:15px;
             }
 
 
@@ -471,14 +464,14 @@
                 margin-bottom:-3px;
                 font-family: 'Roboto', sans-serif;
                 font-size: 32px;
-                color:#474747;
+                color:#d1d1d1;
             }
 
             .current-rank{
                 margin-left:111px;
                 font-family: 'Roboto', sans-serif;
                 font-size: 10px;
-                color:#474747;
+                color: #d1d1d1;
             }
 
             .rank-points    {
@@ -545,15 +538,81 @@
                 6px solid transparent;
             }
             .triangle-bottom{
-              border-top:
+                border-top:
                 10px solid #ff000d;
             }
 
+            body {
+                background-image: url("https://factschronicle.com/wp-content/uploads/2020/04/2020-04-20-image-18.jpg");
+            }
+
+            .rectangle {
+              position:absolute;
+              z-index: -999;
+              height: 124px;
+              width:500px;
+              opacity: 0.3;
+              background-color: black;
+              right:0;
+              border-top: 2px solid #d1d1d1;
+              border-bottom: 2px solid #d1d1d1;
+            }
+
+            .trapezoid-btm-left {
+                opacity: 0.7;
+                position:absolute;
+                border-bottom: 13px solid #555;
+                border-right: 10px solid transparent;
+                height: 0;
+                bottom:32px;
+                width: 15px;
+            }
+
+            .trapezoid-btm-right {
+                opacity: 0.7;
+                position:absolute;
+                border-bottom: 13px solid #555;
+                transform: scaleX(-1);
+                border-right: 10px solid transparent;
+                height: 0;
+                bottom:32px;
+                width: 15px;
+                right:0;
+            }
+            .trapezoid-top-right {
+                opacity: 0.7;
+                position:absolute;
+                border-bottom: 13px solid #555;
+                transform: rotate(180deg);
+                border-right: 10px solid transparent;
+                height: 0;
+                bottom:32px;
+                top:0;
+                right:0;
+                width: 15px;
+            }
+
+             .trapezoid-top-left {
+                opacity: 0.7;
+                position:absolute;
+                border-bottom: 13px solid #555;
+                transform: rotateX(180deg);
+                border-right: 10px solid transparent;
+                height: 0;
+                top:0;
+                left:0;
+                width: 15px;
+                right:0;
+            }
+
+
 
         </style>
-         <div class="trapezoid ">
-            <small class="badge-title">Valorant</small>
-         </div>
+         <div class="rectangle"></div>
+         <div class="trapezoid-top-left"></div>
+          <div class="trapezoid-top-right"></div>
+         <div class="trapezoid-btm-left"></div>
+         <div class="trapezoid-btm-right"></div>
          <div class="main">
              <div class="rank-image">
                 <img src="{{ url_for('static', filename='ranks/' + currentRankCode +'.png') }}" width="100px" height="100px">
