@@ -587,6 +587,29 @@
                    margin-right:5px;
             }
 
+            .game-status {
+                  height: 35px;
+                  width: 180px;
+                  position:absolute;
+                  right:30px;
+                  top:16px;
+                  background-color: #555;
+                  border-radius: 2px;
+                  background-color: #1b8b00;
+background-image: linear-gradient(314deg, #1b8b00 0%, #a2d240 74%);
+
+
+            }
+
+            .game-status  p {
+                    color:white;
+                  text-align: center;
+                  font-size: 28px;
+                  margin-top:1px;
+                  text-transform: uppercase;
+                    font-family: 'Roboto', sans-serif;
+
+             }
         </style>
          <div class="rectangle"></div>
          <div class="trapezoid-top-left"></div>
@@ -599,6 +622,9 @@
              </div>
              <div>
                  <h1 class="rank-name">{{currentRankName}}</h1>
+                  <div class="game-status">
+                    <p>Victory</p>
+                  </div>
                  <small class="current-rank">CURRENT RANK</small>
                  <div class="progress-bar" data-number="{{rankProgression}}"></div>
              </div>
