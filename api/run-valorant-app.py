@@ -49,6 +49,7 @@ def getCookies():
         'X-Forwarded-For': f'{CLIENT_IP}'
     }
     response = requests.post(AUTHORIZATION, headers=headers, json=credentials)
+    print("getCookies", response)
     cookies = response.cookies
     session['riot_cookies'] = cookies.get_dict()
 
@@ -75,7 +76,7 @@ def getAccessToken():
 
     response = requests.put(AUTHORIZATION, headers=headers, json=credentials, cookies=COOKIES)
     # WHAT IF WRONG USERNAME AND PASSWORD -> FIXING....
-    print(response)
+    print("getAccessToken", response)
     uri = response.json()['response']['parameters']['uri']
     data = urllib.parse.parse_qs(uri)
 
@@ -101,7 +102,7 @@ def getEntitlementToken():
 
     response = requests.post(ENTITLEMENT_TOKEN_LINK, headers=headers, json={}, cookies=COOKIES)
     entitlement_token = response.json()['entitlements_token']
-
+    print("getEntitlementToken", response)
     session['riot_entitlement_token'] = entitlement_token
 
     return entitlement_token
@@ -122,6 +123,7 @@ def user():
     }
 
     response = requests.post(AUTHORIZATION_INFORMATION, headers=headers, json={}, cookies=COOKIES)
+    print("user", response)
     data = response.json()
 
     player_id = data['sub']
@@ -223,9 +225,11 @@ def getMatchHistory():
     MATCH_LINK = f'https://pd.{USER_REGION}.a.pvp.net/mmr/v1/players/{PLAYER_ID}/competitiveupdates?startIndex=0&endIndex=1'
 
     response = requests.get(MATCH_LINK, headers=headers, cookies=COOKIES)
-    print(response.json())
+    if not response.status_code == '200':
+        defaultRank = getRankJSON()
+        return defaultRank
+
     data = response.json()['Matches'][0]
-    print(data)
     rank_info = {
         "tier_after_update": data['TierAfterUpdate'],
         "tier_before_update": data['TierBeforeUpdate'],

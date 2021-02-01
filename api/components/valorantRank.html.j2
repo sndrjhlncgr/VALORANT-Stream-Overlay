@@ -3,10 +3,31 @@
         <div xmlns="http://www.w3.org/1999/xhtml" class="container">
         <link rel="preconnect" href="https://fonts.gstatic.com">
         {{ fontawesome_html() }}
+        <meta http-equiv="refresh" content="30">
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Jura&display=swap" rel="stylesheet">
         <style>
+        .progress {
+            border: 0;
+            height: 40px;
+            border-radius: 1px !important;
+        }
+        .progress::-webkit-progress-bar {
+            border: 0;
+            height: 40px;
+            border-radius: 1px;
+        }
+        .progress::-webkit-progress-value {
+            border: 0;
+            height: 40px;
+            border-radius: 1px;
+        }
+        .progress::-moz-progress-bar {
+            border: 0;
+            height: 40px;
+            border-radius: 1px;
+        }
             .progress-bar {
-              border-radius: 8px;
               display: block;
               height: 7px;
               margin: 40px auto;
@@ -35,12 +56,13 @@
             }
 
             .progress-bar:before {
+              border-radius: 1px !important;
               background: {{progressBarColor}};
               background-size: 400% 400%;
               animation: gradient 15s ease infinite;
               border-right: 1px solid #d5aa4f;
-              border-radius: 8px 1px 1px 8px;
               bottom: 0;
+              height: 7px;
               content: "";
               display: inline-block;
               left: 0;
@@ -479,8 +501,7 @@
                 margin-left:186px;
                 margin-top:-21px;
                 margin-bottom:-3px;
-                font-family: 'Roboto', sans-serif;
-                font-weight:bold;
+                   font-family: 'Jura', sans-serif;
                 font-size: 18px;
                 color:#d1d1d1;
             }
@@ -488,25 +509,22 @@
                 margin-left:114px;
                 margin-top:-30px;
                 margin-bottom:-3px;
-                font-family: 'Roboto', sans-serif;
-                font-weight:bold;
+                font-family: 'Jura', sans-serif;
+
                 font-size: 18px;
                 color:#d1d1d1;
             }
 
 
             .headerDivider {
-                 border-left:1px solid #38546d;
+                 border-left:1px solid #d1d1d1;
                  height:21px;
                  position:absolute;
-                 right:286px;
+                 right:284px;
                  top:89px;
             }
 
 
-            body {
-                background-image: url("https://factschronicle.com/wp-content/uploads/2020/04/2020-04-20-image-18.jpg");
-            }
 
             .rectangle {
               position:absolute;
@@ -516,14 +534,14 @@
               opacity: 0.3;
               background-color: black;
               right:0;
-              border-top: 2px solid #d1d1d1;
-              border-bottom: 2px solid #d1d1d1;
+              border-top: 2px solid {{currentColor}};
+              border-bottom: 2px solid {{currentColor}};
             }
 
             .trapezoid-btm-left {
                 opacity: 0.7;
                 position:absolute;
-                border-bottom: 13px solid #555;
+                border-bottom: 13px solid {{currentColor}};
                 border-right: 10px solid transparent;
                 height: 0;
                 bottom:32px;
@@ -533,7 +551,7 @@
             .trapezoid-btm-right {
                 opacity: 0.7;
                 position:absolute;
-                border-bottom: 13px solid #555;
+                border-bottom: 13px solid {{currentColor}};
                 transform: scaleX(-1);
                 border-right: 10px solid transparent;
                 height: 0;
@@ -544,7 +562,7 @@
             .trapezoid-top-right {
                 opacity: 0.7;
                 position:absolute;
-                border-bottom: 13px solid #555;
+                border-bottom: 13px solid {{currentColor}};
                 transform: rotate(180deg);
                 border-right: 10px solid transparent;
                 height: 0;
@@ -557,7 +575,7 @@
              .trapezoid-top-left {
                 opacity: 0.7;
                 position:absolute;
-                border-bottom: 13px solid #555;
+                border-bottom: 13px solid {{currentColor}};
                 transform: rotateX(180deg);
                 border-right: 10px solid transparent;
                 height: 0;
@@ -568,6 +586,7 @@
             }
 
             .fa-chevron-circle-down {
+                padding-top:1px;
                 background: #FF2121;
                 background: -webkit-linear-gradient(to top right, #FF2121 0%, #A30000 73%);
                 background: -moz-linear-gradient(to top right, #FF2121 0%, #A30000 73%);
@@ -596,7 +615,7 @@
                   background-color: #555;
                   border-radius: 2px;
                   background-color: #1b8b00;
-background-image: linear-gradient(314deg, #1b8b00 0%, #a2d240 74%);
+                    background-image: linear-gradient(314deg, #1b8b00 0%, #a2d240 74%);
 
 
             }
@@ -622,11 +641,8 @@ background-image: linear-gradient(314deg, #1b8b00 0%, #a2d240 74%);
              </div>
              <div>
                  <h1 class="rank-name">{{currentRankName}}</h1>
-                  <div class="game-status">
-                    <p>Victory</p>
-                  </div>
                  <small class="current-rank">CURRENT RANK</small>
-                 <div class="progress-bar" data-number="{{rankProgression}}"></div>
+                 <div class="progress-bar progress" data-number="{{rankProgression}}"></div>
              </div>
              <div>
                 <h6 class="rank-map">{{map}}</h6>
